@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+  <p id="socketId">Connecting...</p>
+  <input type="text" id="receiverId" placeholder="Receiver ID">
+  <input type="text" id="message" placeholder="Message">
+  <button onclick="sendMessage()">Send Message</button>
+
+  <h2>Messages</h2>
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = io('http://localhost');
+
+    socket.on('connect', () => {
+        console.log('Connected to server with ID:', socket.id);
+        // Display the socket ID on the UI
+        document.getElementById('socketId').textContent = `Your socket ID: ${socket.id}`;
+      });
+
+    socket.on('receiveMessage', (message) => {
+      console.log('Message received:', message);
+      const messagesList = document.getElementById('messages');
+      const messageItem = document.createElement('li');
+      messageItem.textContent = `From ${message.senderId}: ${message.text}`;
+      messagesList.appendChild(messageItem);
+      
+      // Acknowledge the message
+      acknowledgeMessage(message.messageId);
+    });
+
+    socket.on('messageAcknowledged', (messageId) => {
+      console.log('Message acknowledged:', messageId);
+    });
+
+    function sendMessage() {
+      const receiverId = document.getElementById('receiverId').value;
+      const messageText = document.getElementById('message').value;
+      const message = {
+        receiverId,
+        text: messageText
+      };
+
+      socket.emit('sendMessage', message, (response) => {
+        console.log('Message sent:', response);
+      });
+    }
+
+    function acknowledgeMessage(messageId) {
+      socket.emit('acknowledgeMessage', messageId, (response) => {
+        console.log('Acknowledgment sent:', response);
+      });
+    }
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from the server');
+    });
+  </script>
+</body>
+</html>

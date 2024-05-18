@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:6.0.9
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  mongo:
+    image: mongo:6.0.4
+    ports:
+      - "27019:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=posts
+    volumes:
+      - mongo-data:/data/db
+
+  webserver1:
+    build:
+      context: ./chat-one-to-one/socket-server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  webserver2:
+    build:
+      context: ./chat-one-to-one/socket-server
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./chat-one-to-one/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - webserver1
+      - webserver2
+
+volumes:
+  redis-data:
+  mongo-data:
