@@ -1,0 +1,25 @@
+### Geo add 1
+POST http://localhost:8080/locations
+Content-Type: application/json
+
+{
+  "userId": "Palermo",
+  "latitude": 13.361389,
+  "longitude": 38.115556
+}
+
+### Geo add 2
+POST http://localhost:8080/locations
+Content-Type: application/json
+
+{
+  "userId": "Catania",
+  "latitude": 15.087269,
+  "longitude": 37.502669
+}
+
+### Get nearby locations 1
+GET http://localhost:8080/locations?userId=Palermo&radius=200
+
+### Get nearby locations 2
+GET http://localhost:8080/locations?userId=Palermo&radius=400

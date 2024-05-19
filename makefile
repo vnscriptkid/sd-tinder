@@ -12,3 +12,6 @@ log1:
 
 log2:
 	docker compose logs -f webserver2
+
+redis:
+	docker compose exec redis redis-cli
